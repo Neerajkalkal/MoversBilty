@@ -1,6 +1,6 @@
 package com.example.gangapackagesolution.data
 
-class Data {
+object Data {
     val movingType = listOf(
         "House Hold Goods",
         "Domestic",
@@ -146,4 +146,17 @@ class Data {
         "Moving Company"
     )
 
+    val riskType = listOf(
+        "At Owner Risk",
+        "At Carrier's Risk"
+                         )
+
+    val unitList = listOf(
+        "Kilogram","Gram",
+        "Liter")
+
+    val perhour = listOf(
+        "Per Hour",
+        "Per Day"
+                        )
 }

@@ -23,8 +23,30 @@ class TokenManagement(context: Context) {
     fun getToken(): String? {
         return sharedPreferences.getString("jwtToken", null)
     }
+    fun newUser(newuser:Boolean){
+        sharedPreferences.edit().putBoolean("newUser",newuser).apply()
+    }
+    fun clearNewUser(){
+        sharedPreferences.edit().remove("newUser")
+    }
+
+    fun isNewUser():Boolean{
+        return sharedPreferences.getBoolean("newUser",false)
+    }
 
     fun deleteToken() {
         sharedPreferences.edit().remove("jwtToken")
     }
+    // saving email
+    fun saveEmail(email: String) {
+        sharedPreferences.edit().putString("email", email).apply()
+    }
+    // getting email
+    fun getEmail(): String? {
+        return sharedPreferences.getString("email", null)
+    }
+
+
+
+
 }

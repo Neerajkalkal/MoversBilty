@@ -1,5 +1,5 @@
 package com.example.gangapackagesolution.constants
 
 object Constants {
-    const val baseUrl = "http://10.0.2.2:8080/"
+    const val baseUrl = "http://43.205.237.47:8080/"
 }

@@ -23,7 +23,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -84,6 +85,6 @@ dependencies {
 
     // system status changer
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.0-alpha")
-
+    implementation("io.coil-kt:coil-compose:2.7.0")
 }
 
