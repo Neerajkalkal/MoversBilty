@@ -79,8 +79,10 @@ class MainViewModel(context: Context) : ViewModel() {
 
     fun getQuotation() {
         viewModelScope.launch {
-            Repository.getTheQuotationForm(_quotation,
-                                           token.getToken())
+            Repository.getTheQuotationForm(
+                _quotation,
+                token.getToken()
+                                          )
         }
     }
 
@@ -92,15 +94,19 @@ class MainViewModel(context: Context) : ViewModel() {
 
     fun getAllQuotationList() {
         viewModelScope.launch {
-            Repository.gettingListOfQuotation(_allQuotation,
-                                              token.getToken())
+            Repository.gettingListOfQuotation(
+                _allQuotation,
+                token.getToken()
+                                             )
         }
     }
 
     fun saveEditedQuotation(quotation: Quotation) {
         viewModelScope.launch {
-            Repository.saveEdited(quotation, _allQuotation,
-                                  token.getToken()) {
+            Repository.saveEdited(
+                quotation, _allQuotation,
+                token.getToken()
+                                 ) {
                 refreshTheQuotationPage()
             }
         }
@@ -120,15 +126,18 @@ class MainViewModel(context: Context) : ViewModel() {
         viewModelScope.launch {
             Repository.downloadPdf(
                 id = id, context = context, pdfState = _pdf, share = share, token =
-                token.getToken())
+                token.getToken()
+                                  )
         }
     }
 
     // delete the quotation
     fun deleteQuotation(id: String) {
         viewModelScope.launch {
-            Repository.deleteQuotation(id,
-                                       token.getToken()) {
+            Repository.deleteQuotation(
+                id,
+                token.getToken()
+                                      ) {
                 refreshTheQuotationPage()
             }
         }
@@ -143,8 +152,10 @@ class MainViewModel(context: Context) : ViewModel() {
     // gettingPackagingList
     fun getPackagingList() {
         viewModelScope.launch {
-            Repository.getPackagingList(_getPackagingList,
-                                        token.getToken())
+            Repository.getPackagingList(
+                _getPackagingList,
+                token.getToken()
+                                       )
         }
     }
 
@@ -170,8 +181,10 @@ class MainViewModel(context: Context) : ViewModel() {
 
     fun deletePackageList(id: Int) {
         viewModelScope.launch {
-            Repository.deletePackageList(id.toString(), _getPackagingList,
-                                         token.getToken()) {
+            Repository.deletePackageList(
+                id.toString(), _getPackagingList,
+                token.getToken()
+                                        ) {
                 getPackagingList()
             }
         }
@@ -255,7 +268,7 @@ class MainViewModel(context: Context) : ViewModel() {
         billState: BillState,
         onComplete: () -> Unit,
 
-                ) {
+        ) {
         viewModelScope.launch {
             val bill = bill(
                 id = billID.toString(),
@@ -337,8 +350,7 @@ class MainViewModel(context: Context) : ViewModel() {
                     onComplete()
                     billID = -12
                 },
-                url = "addBill"
-                ,
+                url = "addBill",
                 token.getToken()
                                   )
 
@@ -417,8 +429,10 @@ class MainViewModel(context: Context) : ViewModel() {
     // delete Lr bills
     fun deleteLr(id: String) {
         viewModelScope.launch {
-            Repository.deleteLrBilty(id, _lrBill,
-                                     token.getToken()) {
+            Repository.deleteLrBilty(
+                id, _lrBill,
+                token.getToken()
+                                    ) {
                 getLrBill()
             }
         }
@@ -431,8 +445,10 @@ class MainViewModel(context: Context) : ViewModel() {
     // get bills
     fun getBill() {
         viewModelScope.launch {
-            Repository.getBill(_bill,
-                               token.getToken())
+            Repository.getBill(
+                _bill,
+                token.getToken()
+                              )
         }
     }
 
@@ -440,8 +456,10 @@ class MainViewModel(context: Context) : ViewModel() {
     // delete bill
     fun deleteBill(id: String) {
         viewModelScope.launch {
-            Repository.deleteBill(id, _bill,
-                                  token.getToken()) {
+            Repository.deleteBill(
+                id, _bill,
+                token.getToken()
+                                 ) {
                 getBill()
             }
         }
@@ -455,8 +473,10 @@ class MainViewModel(context: Context) : ViewModel() {
 
     fun getMoneyReceipt() {
         viewModelScope.launch {
-            Repository.getMoneyReceipt(_getMoneyReceiptState,
-                                       token.getToken())
+            Repository.getMoneyReceipt(
+                _getMoneyReceiptState,
+                token.getToken()
+                                      )
         }
     }
 
@@ -464,8 +484,10 @@ class MainViewModel(context: Context) : ViewModel() {
     // delete money reciept
     fun deleteMoneyReceipt(id: String) {
         viewModelScope.launch {
-            Repository.deleteMoneyReceipt(id, _getMoneyReceiptState,
-                                          token.getToken()) {
+            Repository.deleteMoneyReceipt(
+                id, _getMoneyReceiptState,
+                token.getToken()
+                                         ) {
                 getMoneyReceipt()
             }
         }
@@ -482,8 +504,10 @@ class MainViewModel(context: Context) : ViewModel() {
                       ) {
 
         viewModelScope.launch {
-            Repository.getUserDetails(_userDetails,token.getToken(),
-                                      token.getToken())
+            Repository.getUserDetails(
+                _userDetails, token.getToken(),
+                token.getToken()
+                                     )
         }
     }
 
@@ -501,8 +525,7 @@ class MainViewModel(context: Context) : ViewModel() {
             token.getToken()?.let {
                 Repository.saveUserDetails(
                     detailsToSend, _newUserState,
-                    it
-                    ,
+                    it,
                     token.getToken()!!
                                           ) {
                     onComplete()
@@ -522,5 +545,24 @@ class MainViewModel(context: Context) : ViewModel() {
         _newUserState.value = DataOrException()
     }
 
+    fun sendImage(
+        type: String,
+        link: String,
+        onComplete: () -> Unit,
+        onError: (String) -> Unit
 
+                 ) {
+
+        viewModelScope.launch {
+            Repository.sendImage(
+                jwt = token.getToken().toString(),
+                type = type,
+                link = link,
+                onCompleted = { onComplete() },
+                error = { onError(it) }
+
+                                )
+
+        }
+    }
 }

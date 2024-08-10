@@ -27,6 +27,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.lang.Error
 
 object Repository {
 
@@ -231,7 +232,8 @@ object Repository {
                 }
 
             } catch (e: Exception) {
-                quotationState.value =  DataOrException(e = IOException("Something went wrong"), loading = false)
+                quotationState.value =
+                    DataOrException(e = IOException("Something went wrong"), loading = false)
             }
 
         }
@@ -540,7 +542,7 @@ object Repository {
     suspend fun deleteLrBilty(
         id: String,
         packageListState: MutableStateFlow<DataOrException<List<LrBilty>, Exception>>,
-       token: String?,
+        token: String?,
         refresh: () -> Unit,
                              ) {
         packageListState.value = DataOrException(loading = true)
@@ -782,7 +784,7 @@ object Repository {
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
 
-                    if (response.body?.string()=="T") {
+                    if (response.body?.string() == "T") {
                         userDetailsState.value = DataOrException(loading = false)
                         withContext(Dispatchers.Main) {
                             done()
@@ -805,8 +807,39 @@ object Repository {
 
     }
 
-    fun getJwt(): String {
-        return "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIrOTE3MDE1OTMyMjI5In0.W4waiHkFPZDZnbbiNyFdgF4HhKuirpgDPg6Y0sLdRIk"
+    // sending image
+    suspend fun sendImage(
+        jwt: String,
+        type: String,
+        link: String,
+        onCompleted: () -> Unit,
+        error: (String) -> Unit
+                         ) {
+        val requestBody = link.toRequestBody("text/plain".toMediaTypeOrNull())
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url("${Constants.baseUrl}SendImage/$jwt/$type")
+            .post(requestBody)
+            .build()
+
+        withContext(Dispatchers.IO) {
+            try {
+                client.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) {
+                        val responseBody = response.body?.string()
+                        if (responseBody == "Done") {
+                            onCompleted()
+                        } else {
+                            error("Something went wrong: $responseBody")
+                        }
+                    } else {
+                        error("HTTP error: ${response.code}")
+                    }
+                }
+            } catch (e: Exception) {
+                error(e.message.toString())
+            }
+        }
     }
 
 }

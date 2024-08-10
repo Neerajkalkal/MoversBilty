@@ -9,7 +9,8 @@ data class UserDetails(
     val signature: String,
     val companyLogo:String,
     val subscribed:Boolean,
-    val subscription:List<Pricing>
+    val subscription:List<Pricing>,
+    val qrCode:String
                       )
 
 

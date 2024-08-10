@@ -86,5 +86,9 @@ dependencies {
     // system status changer
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.0-alpha")
     implementation("io.coil-kt:coil-compose:2.7.0")
+
+    implementation ("com.amazonaws:aws-android-sdk-s3:2.22.1")
+    implementation ("com.amazonaws:aws-android-sdk-core:2.22.1")
+
 }
 
