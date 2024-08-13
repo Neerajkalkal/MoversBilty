@@ -1,5 +1,6 @@
 package com.example.gangapackagesolution.screens.lrbilty.showlrbilty
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -351,6 +353,7 @@ fun ShowMorePackage(
     ) {
     Dialog(onDismissRequest = { showDialog.value = false }) {
         Surface {
+            val context = LocalContext.current
             Column {
                 Text(
                     text = "Id.: ${lrBilty.lrNumber}",
@@ -364,10 +367,22 @@ mainViewModel.deleteLr(id = lrBilty.id.toString())
                 }
                 HorizontalDivider()
                 ShowOptions(s = "Share Pdf", delete = R.drawable.next) {
+                    mainViewModel.downloadPdf(
+                        context = context,
+                        id = lrBilty.id.toString(),
+                        share = true,
+                        url = "LrBill"
+                                             )
                 }
                 HorizontalDivider()
                 ShowOptions(s = "View Pdf", delete = R.drawable.pdf) {
-
+                    Log.d("helllo ", "main viewmodel is working till now")
+                    mainViewModel.downloadPdf(
+                        context = context,
+                        id = lrBilty.id.toString(),
+                        share = false,
+                        url = "LrBill"
+                                             )
                 }
                 HorizontalDivider()
                 ShowOptions(s = "Generate Bill", delete = R.drawable.bill) {

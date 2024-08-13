@@ -1,6 +1,7 @@
 package com.example.gangapackagesolution.screens
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -66,8 +67,7 @@ class MainViewModel(context: Context) : ViewModel() {
                         ) {
         viewModelScope.launch {
             Repository.saveQuotation(
-                quotation, _quotaionSaveState,
-                token.getToken()
+                quotation, _quotaionSaveState, token.getToken()
                                     ) {
 
                 onComplete()
@@ -80,8 +80,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun getQuotation() {
         viewModelScope.launch {
             Repository.getTheQuotationForm(
-                _quotation,
-                token.getToken()
+                _quotation, token.getToken()
                                           )
         }
     }
@@ -95,8 +94,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun getAllQuotationList() {
         viewModelScope.launch {
             Repository.gettingListOfQuotation(
-                _allQuotation,
-                token.getToken()
+                _allQuotation, token.getToken()
                                              )
         }
     }
@@ -104,8 +102,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun saveEditedQuotation(quotation: Quotation) {
         viewModelScope.launch {
             Repository.saveEdited(
-                quotation, _allQuotation,
-                token.getToken()
+                quotation, _allQuotation, token.getToken()
                                  ) {
                 refreshTheQuotationPage()
             }
@@ -125,8 +122,7 @@ class MainViewModel(context: Context) : ViewModel() {
               ) {
         viewModelScope.launch {
             Repository.downloadPdf(
-                id = id, context = context, pdfState = _pdf, share = share, token =
-                token.getToken()
+                id = id, context = context, pdfState = _pdf, share = share, token = token.getToken()
                                   )
         }
     }
@@ -135,8 +131,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun deleteQuotation(id: String) {
         viewModelScope.launch {
             Repository.deleteQuotation(
-                id,
-                token.getToken()
+                id, token.getToken()
                                       ) {
                 refreshTheQuotationPage()
             }
@@ -153,8 +148,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun getPackagingList() {
         viewModelScope.launch {
             Repository.getPackagingList(
-                _getPackagingList,
-                token.getToken()
+                _getPackagingList, token.getToken()
                                        )
         }
     }
@@ -182,8 +176,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun deletePackageList(id: Int) {
         viewModelScope.launch {
             Repository.deletePackageList(
-                id.toString(), _getPackagingList,
-                token.getToken()
+                id.toString(), _getPackagingList, token.getToken()
                                         ) {
                 getPackagingList()
             }
@@ -198,8 +191,7 @@ class MainViewModel(context: Context) : ViewModel() {
         viewModelScope.launch {
 
             val lrBilty1 = LrBilty(
-                id = lrBiltyno,
-                lrNumber = lrBiltyState.lrNumber.value,
+                id = lrBiltyno, lrNumber = lrBiltyState.lrNumber.value,
                 lrDate = lrBiltyState.lrDate.value, riskType = lrBiltyState.riskType.value,
                 truckNumber = lrBiltyState.truckNumber.value,
                 materialInsurance = lrBiltyState.materialInsurance.value,
@@ -251,8 +243,7 @@ class MainViewModel(context: Context) : ViewModel() {
                 State = _lrbilty, List = lrBilty1, onCompleted = {
                     onComplete()
                     lrBiltyno = -12
-                }, url = "addLrBill",
-                token.getToken()
+                }, url = "addLrBill", token.getToken()
                                   )
 
         }
@@ -271,26 +262,19 @@ class MainViewModel(context: Context) : ViewModel() {
         ) {
         viewModelScope.launch {
             val bill = bill(
-                id = billID.toString(),
-                billNumber = billState.billNumber.value,
-                companyName = billState.companyName.value,
-                lrNumber = billState.lrNumber.value,
+                id = billID.toString(), billNumber = billState.billNumber.value,
+                companyName = billState.companyName.value, lrNumber = billState.lrNumber.value,
                 invoiceDate = billState.invoiceDate.value,
                 deliveryDate = billState.deliveryDate.value,
                 movingPath = billState.movingPath.value,
                 typeOfShipment = billState.typeOfShipment.value,
                 movingPathRemark = billState.movingPathRemark.value,
-                moveFrom = billState.moveFrom.value,
-                moveTo = billState.moveTo.value,
+                moveFrom = billState.moveFrom.value, moveTo = billState.moveTo.value,
                 vehicleNumber = billState.vehicleNumber.value,
-                billToName = billState.billToName.value,
-                billToPhone = billState.billToPhone.value,
-                gstin = billState.gstin.value,
-                country = billState.country.value,
-                state = billState.state.value,
-                city = billState.city.value,
-                pinCode = billState.pinCode.value,
-                address = billState.address.value,
+                billToName = billState.billToName.value, billToPhone = billState.billToPhone.value,
+                gstin = billState.gstin.value, country = billState.country.value,
+                state = billState.state.value, city = billState.city.value,
+                pinCode = billState.pinCode.value, address = billState.address.value,
                 citionsignorName = billState.citionsignorName.value,
                 citionsignorPhone = billState.citionsignorPhone.value,
                 citionsignorGstin = billState.citionsignorGstin.value,
@@ -308,10 +292,8 @@ class MainViewModel(context: Context) : ViewModel() {
                 consigneePinCode = billState.consigneePinCode.value,
                 consigneeAddress = billState.consigneeAddress.value,
                 packageName = billState.packageName.value,
-                description = billState.description.value,
-                weight = billState.weight.value,
-                selectedWeight = billState.weightType.value,
-                remarks = billState.remarks.value,
+                description = billState.description.value, weight = billState.weight.value,
+                selectedWeight = billState.weightType.value, remarks = billState.remarks.value,
                 freightCharge = billState.freightCharge.value,
                 advancePaid = billState.advancePaid.value,
                 packingCharge = billState.packingCharge.value,
@@ -322,36 +304,26 @@ class MainViewModel(context: Context) : ViewModel() {
                 StorageCharge = billState.StorageCharge.value,
                 carbikeTpt = billState.carbikeTpt.value,
                 miscellaneousCharge = billState.miscellaneousCharge.value,
-                otherCharge = billState.otherCharge.value,
-                stCharge = billState.stCharge.value,
-                greentax = billState.greentax.value,
-                subcharge = billState.subcharge.value,
-                gstinorex = billState.gstinorex.value,
-                gst = billState.gst.value,
-                gstType = billState.gstType.value,
-                reverseCharge = billState.reverseCharge.value,
+                otherCharge = billState.otherCharge.value, stCharge = billState.stCharge.value,
+                greentax = billState.greentax.value, subcharge = billState.subcharge.value,
+                gstinorex = billState.gstinorex.value, gst = billState.gst.value,
+                gstType = billState.gstType.value, reverseCharge = billState.reverseCharge.value,
                 gstpaidby = billState.gstpaidby.value,
-                paymentRemark = billState.paymentRemark.value,
-                discount = billState.discount.value,
+                paymentRemark = billState.paymentRemark.value, discount = billState.discount.value,
                 insuranceType = billState.insuranceType.value,
                 insuranceCharge = billState.insuranceCharge.value,
                 insuranceGst = billState.insuranceGst.value,
                 vehicleInsuranceType = billState.vehicleInsuranceType.value,
                 vehicleInsuranceCharge = billState.vehicleInsuranceCharge.value,
                 vehicleInsuranceGst = billState.vehicleInsuranceGst.value,
-                vehicleInsuranceRemark = billState.vehicleInsuranceRemark.value,
-                total = null
+                vehicleInsuranceRemark = billState.vehicleInsuranceRemark.value, total = null
                            )
 
             Repository.addFunction(
-                State = _sendBill,
-                List = bill,
-                onCompleted = {
+                State = _sendBill, List = bill, onCompleted = {
                     onComplete()
                     billID = -12
-                },
-                url = "addBill",
-                token.getToken()
+                }, url = "addBill", token.getToken()
                                   )
 
         }
@@ -390,14 +362,11 @@ class MainViewModel(context: Context) : ViewModel() {
                 remarks = moneyReceiptState.remarks.value,
                                             )
             Repository.addFunction(
-                State = _moneyReceipt,
-                List = moneyReceipt1,
-                url = "addMoneyReceipt",
+                State = _moneyReceipt, List = moneyReceipt1, url = "addMoneyReceipt",
                 onCompleted = {
                     onComplete()
                     moneyreceiptno = -12
-                },
-                token = token.getToken()
+                }, token = token.getToken()
                                   )
 
         }
@@ -413,8 +382,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun getLrBill() {
         viewModelScope.launch {
             Repository.getLrBill(
-                _lrBill,
-                token.getToken()
+                _lrBill, token.getToken()
                                 )
         }
     }
@@ -430,8 +398,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun deleteLr(id: String) {
         viewModelScope.launch {
             Repository.deleteLrBilty(
-                id, _lrBill,
-                token.getToken()
+                id, _lrBill, token.getToken()
                                     ) {
                 getLrBill()
             }
@@ -446,8 +413,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun getBill() {
         viewModelScope.launch {
             Repository.getBill(
-                _bill,
-                token.getToken()
+                _bill, token.getToken()
                               )
         }
     }
@@ -457,8 +423,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun deleteBill(id: String) {
         viewModelScope.launch {
             Repository.deleteBill(
-                id, _bill,
-                token.getToken()
+                id, _bill, token.getToken()
                                  ) {
                 getBill()
             }
@@ -474,8 +439,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun getMoneyReceipt() {
         viewModelScope.launch {
             Repository.getMoneyReceipt(
-                _getMoneyReceiptState,
-                token.getToken()
+                _getMoneyReceiptState, token.getToken()
                                       )
         }
     }
@@ -485,8 +449,7 @@ class MainViewModel(context: Context) : ViewModel() {
     fun deleteMoneyReceipt(id: String) {
         viewModelScope.launch {
             Repository.deleteMoneyReceipt(
-                id, _getMoneyReceiptState,
-                token.getToken()
+                id, _getMoneyReceiptState, token.getToken()
                                          ) {
                 getMoneyReceipt()
             }
@@ -505,8 +468,7 @@ class MainViewModel(context: Context) : ViewModel() {
 
         viewModelScope.launch {
             Repository.getUserDetails(
-                _userDetails, token.getToken(),
-                token.getToken()
+                _userDetails, token.getToken(), token.getToken()
                                      )
         }
     }
@@ -524,9 +486,7 @@ class MainViewModel(context: Context) : ViewModel() {
         viewModelScope.launch {
             token.getToken()?.let {
                 Repository.saveUserDetails(
-                    detailsToSend, _newUserState,
-                    it,
-                    token.getToken()!!
+                    detailsToSend, _newUserState, it, token.getToken()!!
                                           ) {
                     onComplete()
                 }
@@ -554,15 +514,32 @@ class MainViewModel(context: Context) : ViewModel() {
                  ) {
 
         viewModelScope.launch {
-            Repository.sendImage(
-                jwt = token.getToken().toString(),
-                type = type,
-                link = link,
-                onCompleted = { onComplete() },
-                error = { onError(it) }
+            Repository.sendImage(jwt = token.getToken().toString(), type = type, link = link,
+                                 onCompleted = { onComplete() }, error = { onError(it) }
 
                                 )
 
         }
     }
+
+    private val _lrBillPdfState =
+        MutableStateFlow<DataOrException<String, Exception>>(DataOrException())
+    val lrBillState: StateFlow<DataOrException<String, Exception>> = _lrBillPdfState
+    fun downloadPdf(
+        context: Context,
+        id: String,
+        share: Boolean,
+        url: String
+                   ) {
+        Log.d("helllo ","main viewmodel is working till now")
+        viewModelScope.launch {
+
+
+            Repository.downloadPdfGeneral(
+                context = context, id = id, pdfState = _lrBillPdfState, share = share,
+                token = token.getToken(), url = url
+                                         )
+        }
+    }
+
 }

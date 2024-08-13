@@ -842,4 +842,79 @@ object Repository {
         }
     }
 
+    suspend fun downloadPdfGeneral(
+        context: Context,
+        id: String,
+        pdfState: MutableStateFlow<DataOrException<String, Exception>>,
+        share: Boolean,
+        token: String?,
+        url:String
+                           ) {
+        pdfState.value = DataOrException(loading = true)
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url("${Constants.baseUrl}$url/$id/$token")
+            .get()
+            .build()
+
+        try {
+            withContext(Dispatchers.IO) {
+                val response = client.newCall(request).execute()
+
+                if (response.isSuccessful) {
+                    response.body?.let { responseBody ->
+                        val pdfBytes = responseBody.bytes()
+                        val file = File(context.cacheDir, "$url$id.pdf")
+
+                        FileOutputStream(file).use { fos ->
+                            fos.write(pdfBytes)
+                        }
+                        val uri = FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.provider",
+                            file
+                                                            )
+                        if (!share) {
+                            // View the PDF
+
+                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                setDataAndType(uri, "application/pdf")
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            context.startActivity(intent)
+                            pdfState.value =
+                                DataOrException(data = "Download Successful", loading = false)
+                        } else {
+
+
+                            // Share the PDF
+                            val intent = Intent(Intent.ACTION_SEND).apply {
+                                type = "application/pdf"
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            val shareIntent = Intent.createChooser(intent, "Share Quotation")
+                            context.startActivity(shareIntent)
+                            pdfState.value =
+                                DataOrException(data = "Share Successful", loading = false)
+
+                        }
+                    }
+
+                        ?: throw IOException("Response body is null")
+                } else {
+                    pdfState.value = DataOrException(
+                        e = IOException("Server responded with error: ${response.code}"),
+                        loading = false
+                                                    )
+                }
+            }
+        } catch (e: IOException) {
+            pdfState.value = DataOrException(e = e, loading = false)
+        } catch (e: Exception) {
+            pdfState.value = DataOrException(e = e, loading = false)
+        }
+    }
+
+
 }

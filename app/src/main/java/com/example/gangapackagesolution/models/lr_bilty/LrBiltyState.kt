@@ -40,29 +40,29 @@ data class LrBiltyState(
     val address1: MutableState<String> = mutableStateOf(""),
 
     //packages details
-    val numberOfPackages: MutableState<String> = mutableStateOf(""),
+    val numberOfPackages: MutableState<String> = mutableStateOf("0"),
     val description: MutableState<String> = mutableStateOf(""),
     val Unit: MutableState<String> = mutableStateOf("KiloGram"),
-    val actualWeight: MutableState<String> = mutableStateOf(""),
-    val chargedWeight: MutableState<String> = mutableStateOf(""),
+    val actualWeight: MutableState<String> = mutableStateOf("0"),
+    val chargedWeight: MutableState<String> = mutableStateOf("0"),
     val receivePackageCondition: MutableState<String> = mutableStateOf("ALL ITEMS IN GOOD CONDITION"),
     val remarks:  MutableState<String> = mutableStateOf(""),
 
     // payment details
-    val freightToBeBilled: MutableState<String> = mutableStateOf(""),
-    val freightPaid: MutableState<String> = mutableStateOf(""),
-    val freightBalance: MutableState<String> = mutableStateOf(""),
-    val totalBasicFreight: MutableState<String> = mutableStateOf(""),
-    val loadingCharges: MutableState<String> = mutableStateOf(""),
-    val unloadingCharges: MutableState<String> = mutableStateOf(""),
-    val stCharges: MutableState<String> = mutableStateOf(""),
-    val otherCharges: MutableState<String> = mutableStateOf(""),
-    val lr_cnCharges: MutableState<String> = mutableStateOf(""),
-    val gstperc: MutableState<String> = mutableStateOf(""),
+    val freightToBeBilled: MutableState<String> = mutableStateOf("0"),
+    val freightPaid: MutableState<String> = mutableStateOf("0"),
+    val freightBalance: MutableState<String> = mutableStateOf("0"),
+    val totalBasicFreight: MutableState<String> = mutableStateOf("0"),
+    val loadingCharges: MutableState<String> = mutableStateOf("0"),
+    val unloadingCharges: MutableState<String> = mutableStateOf("0"),
+    val stCharges: MutableState<String> = mutableStateOf("0"),
+    val otherCharges: MutableState<String> = mutableStateOf("0"),
+    val lr_cnCharges: MutableState<String> = mutableStateOf("0"),
+    val gstperc: MutableState<String> = mutableStateOf("18"),
     val gstPaidBy: MutableState<String> = mutableStateOf(""),
     // material insurance
 
-    val materialInsurance: MutableState<String> = mutableStateOf(""),
+    val materialInsurance: MutableState<String> = mutableStateOf("0"),
     val insuranceCompany: MutableState<String> = mutableStateOf(""),
     val policyNumber: MutableState<String> = mutableStateOf(""),
     val insuranceDate: MutableState<String> = mutableStateOf(""),
@@ -70,8 +70,8 @@ data class LrBiltyState(
     val insuranceRisk: MutableState<String> = mutableStateOf(""),
 
     // demurrage charge
-    val demarrageCharge: MutableState<String> = mutableStateOf(""),
-    val perDayorhour: MutableState<String> = mutableStateOf(""),
+    val demarrageCharge: MutableState<String> = mutableStateOf("500"),
+    val perDayorhour: MutableState<String> = mutableStateOf("per Hour"),
     val demurageChargeApplicableAfter: MutableState<String> = mutableStateOf(""),
 
     )
