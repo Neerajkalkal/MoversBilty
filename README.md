@@ -1,6 +1,6 @@
-# GangaPackaging Backend
+# Movers Bilty
 ## Overview
-The GangaPackaging Backend App is a comprehensive application designed for generating PDFs of bills, quotations, LRs, MRs, and other documents. 
+The Movers Bilty App is a comprehensive application designed for generating PDFs of bills, quotations, LRs, MRs, and other documents. 
 The app features user authentication, secure login, and various functionalities for managing and creating documents. The backend is developed using Spring Boot, and the project utilizes AWS EC2 and S3 for deployment and file storage.
 
 # Features
