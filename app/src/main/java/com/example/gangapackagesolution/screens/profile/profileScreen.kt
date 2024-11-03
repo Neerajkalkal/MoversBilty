@@ -86,8 +86,7 @@ val imageUri = remember {
 
     // AWS credentials
     val credentialsProvider = CognitoCachingCredentialsProvider(
-        context, "ap-south-1:1fa94817-d63a-472e-8981-660d588fa0d1", Regions.AP_SOUTH_1
-                                                               )
+        context, "", Regions                                                               )
     val s3Client = AmazonS3Client(credentialsProvider)
 
     val state = mainViewModel.userDetails.collectAsState()
