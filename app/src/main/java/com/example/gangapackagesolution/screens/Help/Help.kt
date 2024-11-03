@@ -69,7 +69,7 @@ fun HelpContent() {
 
                 Spacer(modifier = Modifier.padding(10.dp))
                 Text(
-                    text = "If You have Any Kind of Problem related to if any function is not working or any Subscription issue then please Whatsapp on below Number with Screenshot our technical team will reach out you with in 24 hours",
+                    text = "If You Want to subscribe us or have some technical issues then please tap on below given whatsapp",
                     style = MaterialTheme.typography.bodyMedium,
                     fontFamily = latosemibold,
                     textAlign = TextAlign.Center,

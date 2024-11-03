@@ -17,6 +17,7 @@ import com.example.gangapackagesolution.models.lr_bilty.LrBilty
 import com.example.gangapackagesolution.models.lr_bilty.LrBiltyState
 import com.example.gangapackagesolution.models.moneyreceipt.MoneyReceipt
 import com.example.gangapackagesolution.models.moneyreceipt.MoneyReceiptState
+import com.example.gangapackagesolution.models.notifications.Notifications
 import com.example.gangapackagesolution.models.packageList.PackageList
 import com.example.gangapackagesolution.models.packageList.state.CustomerDetails
 import com.example.gangapackagesolution.models.packageList.state.packingListItems
@@ -531,7 +532,7 @@ class MainViewModel(context: Context) : ViewModel() {
         share: Boolean,
         url: String
                    ) {
-        Log.d("helllo ","main viewmodel is working till now")
+        Log.d("helllo ", "main viewmodel is working till now")
         viewModelScope.launch {
 
 
@@ -541,5 +542,25 @@ class MainViewModel(context: Context) : ViewModel() {
                                          )
         }
     }
+
+    private val _notificationState =
+        MutableStateFlow<DataOrException<List<Notifications>, Exception>>(DataOrException())
+    val notifications: StateFlow<DataOrException<List<Notifications>, Exception>> = _notificationState
+
+    fun getNotifications() {
+        viewModelScope.launch {
+            Repository.getNotifications(
+                _notificationState,
+                token.getToken()
+                                       )
+        }
+    }
+
+    fun sendNotificationsUpdate() {
+        viewModelScope.launch {
+Repository.SendNotificationsUpdate(token.getToken())
+        }
+    }
+
 
 }

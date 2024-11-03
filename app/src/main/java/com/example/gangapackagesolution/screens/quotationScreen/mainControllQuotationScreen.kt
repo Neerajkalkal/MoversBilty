@@ -14,7 +14,7 @@ import com.example.gangapackagesolution.screens.screenName.Screens
 import kotlinx.coroutines.delay
 
 @Composable
-fun QuotationMainScreen(MainViewModel: MainViewModel, navController: NavController) {
+fun QuotationMainScreen(MainViewModel: MainViewModel, navController: NavController,color: Color) {
 
     val showScreen = remember {
         mutableStateOf(true)
@@ -42,10 +42,10 @@ fun QuotationMainScreen(MainViewModel: MainViewModel, navController: NavControll
     if (
         showScreen.value
     ) {
-        LoadingScreen(color = Color(0xFF673AB7), indicatorColor = Color.White)
+        LoadingScreen(color = color, indicatorColor = Color.White)
     } else {
         if (quotationState.value.data != null) {
-            QuotationScreen(quotationState.value.data!!) {
+            QuotationScreen(quotationState.value.data!!,color,navController) {
                 showScreen.value = true
                 MainViewModel.saveNewQuotation(it) {
                     navController.navigate(Screens.QuoteList.name){

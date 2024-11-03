@@ -6,5 +6,5 @@ data class DetailsToSend(val name: String,
     val mobileNo:String,
     val bankAccount:String,
     val ifscCode:String,
-    val address:String
-                        )
+    val address:String,
+    val firebaseToken:String)

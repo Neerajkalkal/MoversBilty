@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "749613527998",
+    "project_id": "ganga-store-9947a",
+    "storage_bucket": "ganga-store-9947a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:749613527998:android:149554c848547ba6453fef",
+        "android_client_info": {
+          "package_name": "com.example.gangapackagesolution"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMlkzenY-tzru3tnrbwmvIpfi_tuRQ0kE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

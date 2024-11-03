@@ -33,8 +33,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.gangapackagesolution.models.DetailsToSend
+import com.example.gangapackagesolution.repository.Repository
 import com.example.gangapackagesolution.repository.TokenManagement
 import com.example.gangapackagesolution.screens.MainViewModel
 import com.example.gangapackagesolution.screens.TexInput
@@ -42,6 +44,8 @@ import com.example.gangapackagesolution.screens.loadingAndErrorScreen.ErrorScree
 import com.example.gangapackagesolution.screens.screenName.Screens
 import com.example.gangapackagesolution.ui.theme.latosemibold
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.launch
 
 @Composable
 fun NewUser(
@@ -78,19 +82,19 @@ fun NewUser(
         mutableStateOf("")
     }
 
-    val state =  mainViewModel.newUserState.collectAsState()
+    val state = mainViewModel.newUserState.collectAsState()
 
     val error = remember {
         mutableStateOf(false)
     }
 
-    if (error.value){
-        ErrorScreen(error ="The Fields Denoted By * Are Compulsory") {
-        error.value = false
+    if (error.value) {
+        ErrorScreen(error = "The Fields Denoted By * Are Compulsory") {
+            error.value = false
         }
     }
 
-    if (state.value.e!=null){
+    if (state.value.e != null) {
         ErrorScreen(error = state.value.e.toString()) {
             mainViewModel.resetError()
         }
@@ -149,42 +153,56 @@ fun NewUser(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            if (state.value.loading){
+            if (state.value.loading) {
                 CircularProgressIndicator(color = Color.White, strokeCap = StrokeCap.Round)
-            }
-            else {
+            } else {
                 Button(
                     onClick = {
                         if (name.value.isNotEmpty() && mobile.value.isNotEmpty() && CompanyName.value.isNotEmpty() && adress.value.isNotEmpty()) {
 
-                            val details = onDone1?.let {
-                                DetailsToSend(
-                                    name = name.value,
-                                    mobileNo = mobile.value,
-                                    companyName = CompanyName.value,
-                                    address = adress.value,
-                                    bankAccount = bankNumber.value,
-                                    ifscCode = ifsc.value,
-                                    email = it
-                                             )
-                            }
 
+                            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    val token = task.result
+                                    val details = onDone1?.let {
+                                        DetailsToSend(
+                                            name = name.value,
+                                            mobileNo = mobile.value,
+                                            companyName = CompanyName.value,
+                                            address = adress.value,
+                                            bankAccount = bankNumber.value,
+                                            ifscCode = ifsc.value,
+                                            email = it,
+                                            firebaseToken = token
+                                                     )
+                                    }
+                                    details?.let {
+                                        mainViewModel.saveNewUser(
+                                            detailsToSend = it
+                                                                 ) {
+                                            TokenManagement.clearNewUser()
+                                            TokenManagement.newUser(false)
+                                            Log.d(
+                                                "jndjendejndenednednejdnefbefdevg ",
+                                                TokenManagement.isNewUser().toString()
+                                                 )
+                                            navController.navigate(Screens.Home.name)
+                                        }
 
-                            details?.let {
-                                mainViewModel.saveNewUser(
-                                    detailsToSend = it) {
-                                    TokenManagement.clearNewUser()
-                                    TokenManagement.newUser(false)
-                                    Log.d("jndjendejndenednednejdnefbefdevg ", TokenManagement.isNewUser().toString())
-                                    navController.navigate(Screens.Home.name)
+                                    }
+
+                                } else {
+
+                                    Log.w(
+                                        "MainActivity", "Fetching FCM registration token failed",
+                                        task.exception
+                                         )
                                 }
                             }
 
 
-                        }
-
-                        else{
-                           error.value = true
+                        } else {
+                            error.value = true
                         }
                     },
                     colors = ButtonDefaults.buttonColors(

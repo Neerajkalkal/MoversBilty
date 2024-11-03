@@ -56,11 +56,12 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @Composable
 fun Login(
     loginViewmodel: loginViewmodel,
-    navController: NavHostController
+    navController: NavHostController,
+    color: MutableState<Color>
          ) {
     val systemUiController = rememberSystemUiController()
     systemUiController.setSystemBarsColor(
-        color = Color(0xFFF44336), // Change to your desired color
+        color = color.value, // Change to your desired color
         darkIcons = false,
 
         )
@@ -114,6 +115,7 @@ fun Login(
                 navController.navigate(Screens.NewUser.name)
 
             } else {
+                loginViewmodel.sendToken()
                 navController.navigate(Screens.Home.name)
             }
         }
@@ -129,7 +131,7 @@ fun Login(
         Column {
 
 
-            WaveWithGradient()
+            WaveWithGradient(color.value)
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -182,7 +184,7 @@ fun Login(
                                 .background(
                                     brush = Brush.linearGradient(
                                         colors = listOf(
-                                            Color(0xFFF44336), Color(0xFFF44336)
+                                          color.value, color.value
                                                        )
                                                                 ), shape = CircleShape
                                            )
@@ -224,10 +226,10 @@ fun Login(
                 }
 
                 if (SendState.value.e != null) {
-                    ShowDialogue(SendState.value.e.toString(), loginViewmodel)
+                    ShowDialogue(SendState.value.e.toString(), loginViewmodel,color)
                 }
                 if (verifyState.value.e != null) {
-                    ShowDialogue(verifyState.value.e.toString(), loginViewmodel)
+                    ShowDialogue(verifyState.value.e.toString(), loginViewmodel, color)
                 }
 
             }
@@ -239,7 +241,8 @@ fun Login(
 @Composable
 fun ShowDialogue(
     SendState: String,
-    loginViewmodel: loginViewmodel
+    loginViewmodel: loginViewmodel,
+    color: MutableState<Color>
                 ) {
     Dialog(onDismissRequest = {
 
@@ -267,7 +270,7 @@ fun ShowDialogue(
                         .background(
                             brush = Brush.linearGradient(
                                 colors = listOf(
-                                    Color(0xFFF44336), Color(0xFFF44336)
+                                  color.value  ,color.value
                                                )
                                                         ), shape = CircleShape
                                    )

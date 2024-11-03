@@ -69,7 +69,8 @@ fun BillScreenForm(
     modifier: Modifier = Modifier,
     billState: BillState,
     navController: NavController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    color: Color
                   ) {
 
 
@@ -105,8 +106,8 @@ fun BillScreenForm(
         topBar = {
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF673AB7),
-                    scrolledContainerColor = Color(0xFF673AB7)
+                    containerColor = color,
+                    scrolledContainerColor = color
                 ),
                 navigationIcon = {
                     IconButton(onClick = { /*add navigation logic*/ }) {
@@ -146,7 +147,8 @@ fun BillScreenForm(
                 items(cardItems) { card ->
                     ActionCard(
                         title = card.title,
-                        expandCardCompose = card.content
+                        expandCardCompose = card.content,
+                        color = color
                     )
                 }
                 item {
@@ -159,7 +161,7 @@ fun BillScreenForm(
                 }
 
                 item {
-                    Button(colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF673AB7)),
+                    Button(colors = ButtonDefaults.buttonColors(containerColor = color),
                         onClick = { mainViewModel.sendBill(billState){
                             navController.popBackStack()
                         } }) {
@@ -186,13 +188,14 @@ fun BillScreenForm(
 fun ActionCard(
     title: String,
     expandCardCompose: @Composable () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color
 ) {
     var expandState by remember {
         mutableStateOf(false) // make sure to set it to false default, I enabled true only for testing :)
     }
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF673AB7)),
+        colors = CardDefaults.cardColors(containerColor = color),
         modifier = modifier
             .fillMaxWidth()
             .animateContentSize(

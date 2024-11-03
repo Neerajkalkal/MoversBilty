@@ -13,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -31,7 +32,8 @@ import com.example.gangapackagesolution.screens.packagingList.components.Custome
 @Composable
 fun PackagingScreen(
     Viewmodel: packagingScreenViewmodel,
-    navController: NavHostController
+    navController: NavHostController,
+    color: Color
                    ) {
 
 
@@ -63,14 +65,14 @@ fun PackagingScreen(
     val state = Viewmodel.packagingState.collectAsState()
 
     if (state.value.loading) {
-        LoadingScreen(color = Color.White, indicatorColor = Color(0xFF673AB7))
+        LoadingScreen(color = Color.White, indicatorColor = color)
     } else if (state.value.e != null) {
         ErrorScreen(error = state.value.e.toString()) {
             navController.popBackStack()
         }
     } else {
 
-        PackageForm(navController, Viewmodel, change, item)
+        PackageForm(navController, Viewmodel, change, item,color)
 
     }
 }
@@ -80,14 +82,13 @@ fun PackageForm(
     navController: NavHostController,
     packagingScreenViewmodel: packagingScreenViewmodel,
     change: MutableState<CustomerDetails>,
-    item: MutableState<packingListItems>
+    item: MutableState<packingListItems>,
+    color: Color
                ) {
     Column() {
         Header(
             text = "Packaging List",
-            color = Color(
-                0xFF673AB7
-                         )
+            color = color
               ) {
             navController.popBackStack()
         }
@@ -107,20 +108,19 @@ fun PackageForm(
                     moveFrom = change.value.moveFrom, moveTo = change.value.moveTo,
                     vehicleNumber = change.value.vehicleNo,
                                 )
-            })
+            }, color =  color)
 
             Spacer(modifier = Modifier.height(20.dp))
             ActionCard(title = "Item Details", expandCardCompose = {
                 ItemParticulars(
                     itemname = item.value.itemname, quantity = item.value.quantity,
                     value = item.value.value, itemremark = item.value.itemremark,
-                    itemParticulars = item.value.itemParticulars
-                               )
-            })
+                    itemParticulars = item.value.itemParticulars,color)
+            }, color = color)
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            CustomButton(onItemClick1 = "Submit") {
+            CustomButton(onItemClick1 = "Submit",color) {
                 packagingScreenViewmodel.submitPackageList(
                     id = change.value.id,
                     itemParticulars = item,

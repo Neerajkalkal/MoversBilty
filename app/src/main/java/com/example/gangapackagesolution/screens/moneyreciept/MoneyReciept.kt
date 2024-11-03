@@ -26,7 +26,8 @@ import java.time.LocalDateTime
 @Composable
 fun MoneyReceipt(
     navController: NavHostController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    value: Color
                 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         val moneyReceiptState = MoneyReceiptState()
@@ -38,7 +39,7 @@ fun MoneyReceipt(
         moneyReceiptState.paymentMode.value = "Cash"
 
 
-        MoneyReceiptForm(moneyReceiptState, navController,mainViewModel)
+        MoneyReceiptForm(moneyReceiptState, navController,mainViewModel, color = value)
     }
 
 }
@@ -47,12 +48,13 @@ fun MoneyReceipt(
 fun MoneyReceiptForm(
     moneyReceiptState: MoneyReceiptState,
     navController: NavHostController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    color: Color
                     ) {
 
     Column(modifier = Modifier.padding()) {
 
-        Header(text = "Money Receipt", color = Color(0xFF673AB7)) {
+        Header(text = "Money Receipt", color =color) {
             navController.popBackStack()
         }
 
@@ -63,17 +65,17 @@ fun MoneyReceiptForm(
               ) {
             ActionCard(
                 title = "Money Receipt Details",
-                expandCardCompose = { MoneyReceiptDetails(moneyReceiptState) })
+                expandCardCompose = { MoneyReceiptDetails(moneyReceiptState) }, color = color)
 
 
             Spacer(modifier = Modifier.height(20.dp))
 
             ActionCard(
                 title = "Payment and other Details",
-                expandCardCompose = { PaymentAndOtherDetails(moneyReceiptState) })
+                expandCardCompose = { PaymentAndOtherDetails(moneyReceiptState) },color = color)
 
             Spacer(modifier = Modifier.height(20.dp))
-            CustomButton(onItemClick1 = "Save Money Receipt") {
+            CustomButton(onItemClick1 = "Save Money Receipt",color) {
 mainViewModel.moneyReceipt(
 moneyReceiptState = moneyReceiptState
                           ){

@@ -23,9 +23,11 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -54,17 +56,29 @@ import com.example.gangapackagesolution.models.moneyreceipt.MoneyReceiptState
 import com.example.gangapackagesolution.screens.MainViewModel
 import com.example.gangapackagesolution.screens.loadingAndErrorScreen.ErrorScreen
 import com.example.gangapackagesolution.screens.loadingAndErrorScreen.LoadingScreen
+import com.example.gangapackagesolution.screens.packagingList.showpackagingList.PackagingList
 import com.example.gangapackagesolution.screens.screenName.Screens
 import com.example.gangapackagesolution.ui.theme.latolight
 import com.example.gangapackagesolution.ui.theme.latosemibold
 import java.time.LocalDate
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun QuotationListShow(
     viewModel: MainViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    color: MutableState<Color>
                      ) {
+
+    val search = remember {
+        mutableStateOf("")
+    }
+
+    val active = remember {
+        mutableStateOf(false)
+    }
+
     val listState = viewModel.allQuotation.collectAsState()
 
     val list = listState.value.data?.sortedBy {
@@ -80,7 +94,7 @@ fun QuotationListShow(
 
     Column {
         Surface(
-            modifier = Modifier.fillMaxWidth(), color = Color(0xFF673AB7)
+            modifier = Modifier.fillMaxWidth(), color = color.value
                ) {
             Row(
                 modifier = Modifier
@@ -110,7 +124,7 @@ fun QuotationListShow(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        ShoSearch(onClick = {})
+
 
         if (listState.value.e != null) {
             listState.value.e!!.message?.let {
@@ -122,14 +136,63 @@ fun QuotationListShow(
 
 
         if (listState.value.loading) {
-            LoadingScreen(color = Color.White, indicatorColor = Color(0xFF673AB7))
+            LoadingScreen(color = Color.White, indicatorColor = color.value)
         } else {
             if (listState.value.data.isNullOrEmpty()) {
                 EmptyScreen()
             } else {
+
+                val packageList1 = remember {
+                    list
+                }
+
+                var List1 = remember {
+                    mutableStateOf(packageList1)
+                }
+
+                SearchBar(query = search.value, onQueryChange = {
+                    search.value = it
+
+                    if (packageList1 != null) {
+                        List1.value = packageList1.filter { list ->
+
+                            list.partyName.toLowerCase()
+                                .contains(search.value.toLowerCase())
+
+                        }
+                    }
+
+
+                }, onSearch = {
+                    if (packageList1 != null) {
+                        List1.value = packageList1.filter { list ->
+                            list.partyName.toLowerCase()
+                                .contains(search.value.toLowerCase())
+
+                        }
+                    }
+                },
+                          active = active.value, onActiveChange = {
+                        active.value = !active.value
+                    },
+                          modifier = Modifier.fillMaxWidth(),
+                          placeholder = { Text(text = "Search For Name") }) {
+                    LazyColumn() {
+                        items(List1.value.orEmpty()) { quotation ->
+                            ShowQuotation(quotation, viewModel, navController,colors = color.value)
+                        }
+                    }
+
+                }
+
+
+
+
+
+
                 LazyColumn {
                     items(list.orEmpty()) { quotation ->
-                        ShowQuotation(quotation, viewModel, navController)
+                        ShowQuotation(quotation, viewModel, navController,colors = color.value)
                     }
                 }
             }
@@ -152,7 +215,8 @@ fun EmptyScreen() {
 @Composable
 fun ShoSearch(
     onClick: () -> Unit,
-    text: String = "Quotation"
+    text: String = "Quotation",
+    color: Color
              ) {
 
 
@@ -167,7 +231,7 @@ fun ShoSearch(
            ) {
             Icon(
                 imageVector = Icons.Default.Search, contentDescription = "",
-                tint = Color(0xFF673AB7)
+                tint = color
                 )
 
             Text(
@@ -182,9 +246,10 @@ fun ShoSearch(
 fun ShowQuotation(
     quotationList: Quotation,
     viewModel: MainViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    colors: Color
                  ) {
-    val color = if (quotationList.status == "Pending") Color.Red else Color(0xFF4CAF50)
+    val color = if (quotationList.status == "Pending") Color.Red else Color(0xFFFFFFFF)
 
 
     val text = if (quotationList.status != "Pending") "Completed" else "Pending"
@@ -198,7 +263,7 @@ fun ShowQuotation(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp), color = Color(0xFF673AB7),
+            .padding(10.dp), color = colors,
         shape = RoundedCornerShape(10.dp)
            ) {
         Column(
@@ -206,7 +271,7 @@ fun ShowQuotation(
               ) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Quotation Number : ${quotationList.id}", color = Color(0xFFFFC107),
+                    text = "Quotation Number : ${quotationList.id}", color = Color(0xFFFFFFFF),
                     fontFamily = latosemibold, style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -287,11 +352,11 @@ fun ShowQuotation(
 
                     Icon(
                         imageVector = Icons.Default.Edit, contentDescription = "",
-                        tint = Color(0xFFFFC107)
+                        tint = Color(0xFFE4E4E4)
                         )
 
                     Text(
-                        text = "Edit", color = Color(0xFFFFC107), fontFamily = latosemibold,
+                        text = "Edit", color = Color(0xFFFFFFFF), fontFamily = latosemibold,
                         modifier = Modifier.padding(start = 10.dp)
                         )
                 }
@@ -300,13 +365,13 @@ fun ShowQuotation(
                     showMoreDialog.value = true
                 }) {
                     Text(
-                        text = "More", color = Color(0xFFFFC107), fontFamily = latosemibold,
+                        text = "More", color = Color(0xFFF7F7F7), fontFamily = latosemibold,
                         modifier = Modifier.padding(start = 10.dp)
                         )
 
                     Icon(
                         imageVector = Icons.Default.MoreVert, contentDescription = "",
-                        tint = Color(0xFFFFC107)
+                        tint = Color(0xFFFFFFFF)
                         )
 
 

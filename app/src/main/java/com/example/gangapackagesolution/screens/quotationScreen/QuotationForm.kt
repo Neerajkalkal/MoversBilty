@@ -110,7 +110,7 @@ fun QuotationForm(
     includedLoading: MutableState<String>,
     includedUnLoading: MutableState<String>,
     includedPackingMaterial: MutableState<String>,
-
+color: Color,
 onlick: () -> Unit
     ) {
 
@@ -478,7 +478,7 @@ onlick: () -> Unit
             }
             RegularField(itemremark, false, "Remark")
             Spacer(modifier = Modifier.height(10.dp))
-            CustomButton("Save Item") {
+            CustomButton("Save Item",color) {
                 if (
                     !itemParticulars.value.contains(
                         itemParticulars(
@@ -501,7 +501,7 @@ onlick: () -> Unit
             }
             Spacer(modifier = Modifier.height(10.dp))
 
-            ShowAndRemoveItems(itemParticulars = itemParticulars)
+            ShowAndRemoveItems(itemParticulars = itemParticulars,color)
         }
 
 
@@ -511,7 +511,7 @@ onlick: () -> Unit
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        CustomButton("Submit Quotation") {
+        CustomButton("Submit Quotation",color) {
             onlick()
         }
 
@@ -525,7 +525,10 @@ onlick: () -> Unit
 }
 
 @Composable
-fun ShowAndRemoveItems(itemParticulars: MutableState<List<itemParticulars>>) {
+fun ShowAndRemoveItems(
+    itemParticulars: MutableState<List<itemParticulars>>,
+    color: Color
+                      ) {
     if (!itemParticulars.value.isEmpty())
         Surface(
             color = Color.Transparent
@@ -589,10 +592,10 @@ fun ShowAndRemoveItems(itemParticulars: MutableState<List<itemParticulars>>) {
 }
 
 @Composable
-fun CustomButton(onItemClick1: String, onItemClick: () -> Unit) {
+fun CustomButton(onItemClick1: String, color: Color,onItemClick: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp),
-        color = Color(0xFF17FF20)
+        color = Color(0xFFFFFFFF)
     ) {
         Row(horizontalArrangement = Arrangement.Center,
             modifier = Modifier.clickable {
@@ -601,7 +604,7 @@ fun CustomButton(onItemClick1: String, onItemClick: () -> Unit) {
             Text(
                 text = onItemClick1,
                 modifier = Modifier.padding(10.dp),
-                color = Color(0xFF673AB7)
+                color =color
             )
         }
     }

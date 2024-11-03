@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun WaveWithGradient() {
+fun WaveWithGradient(value: Color) {
 
     Canvas(modifier = Modifier
         .fillMaxWidth()
@@ -38,7 +38,7 @@ fun WaveWithGradient() {
         drawPath(
             path = wavePath,
             brush = Brush.linearGradient(
-                colors = listOf(Color(0xFFF44336), Color(0xFFF44336), Color(0xFFF44336),),
+                colors = listOf(value, value,value),
                 start = Offset(0f, 0f),
                 end = Offset(size.width, size.height)
             ),

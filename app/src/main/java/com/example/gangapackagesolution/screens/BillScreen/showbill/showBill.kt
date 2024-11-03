@@ -15,9 +15,11 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
@@ -37,6 +40,7 @@ import com.example.gangapackagesolution.models.bill.bill
 import com.example.gangapackagesolution.models.moneyreceipt.MoneyReceiptState
 import com.example.gangapackagesolution.screens.MainViewModel
 import com.example.gangapackagesolution.screens.loadingAndErrorScreen.LoadingScreen
+import com.example.gangapackagesolution.screens.lrbilty.showlrbilty.ShowBills
 import com.example.gangapackagesolution.screens.packagingList.showpackagingList.ShowingHeader
 import com.example.gangapackagesolution.screens.quotationScreen.quotationShow.EmptyScreen
 import com.example.gangapackagesolution.screens.quotationScreen.quotationShow.ShoSearch
@@ -44,23 +48,31 @@ import com.example.gangapackagesolution.screens.quotationScreen.quotationShow.Sh
 import com.example.gangapackagesolution.screens.screenName.Screens
 import com.example.gangapackagesolution.ui.theme.latosemibold
 import java.time.LocalDate
+import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowBillScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    value: Color
                   ) {
 
     val state = mainViewModel.bill.collectAsState()
     Column {
 
+        val search = remember {
+            mutableStateOf("")
+        }
+        val active = remember {
+            mutableStateOf(false)
+        }
 
-        ShowingHeader(s = "Bills") {
+        ShowingHeader(s = "Bills", color = value, onClick1 = {mainViewModel.getBill()}) {
             navController.popBackStack()
         }
-        ShoSearch(onClick = { /*TODO*/ }, text = "Bills")
         if (state.value.loading) {
-            LoadingScreen(color = Color.White, indicatorColor = Color(0xFF673AB7))
+            LoadingScreen(color = Color.White, indicatorColor = value)
         }
         if (state.value.e != null) {
             Text(text = state.value.e.toString())
@@ -68,9 +80,61 @@ fun ShowBillScreen(
         if (state.value.data != null) {
             if (state.value.data!!.isNotEmpty()) {
                 state.value.data?.let {
+                    val packageList1 = remember {
+                        it
+                    }
+
+                    var List1 = remember {
+                        mutableStateOf(packageList1)
+                    }
+
+                    SearchBar(query = search.value, onQueryChange = {
+                        search.value = it
+
+                        if (packageList1 != null) {
+                            List1.value = packageList1.filter { list ->
+
+                                list.billToName.toLowerCase(Locale.ROOT)
+                                    .contains(
+                                        search.value.toLowerCase()
+                                             ) || list.citionsignorName.toLowerCase()
+                                    .contains(search.value.toLowerCase())
+
+                            }
+                        }
+
+
+                    }, onSearch = {
+                        if (packageList1 != null) {
+                            List1.value = packageList1.filter { list ->
+
+                                list.billToName.toLowerCase()
+                                    .contains(
+                                        search.value.toLowerCase()
+                                             ) || list.consigneeName.toLowerCase()
+                                    .contains(search.value.toLowerCase())
+
+                            }
+                        }
+                    },
+                              active = active.value, onActiveChange = {
+                            active.value = !active.value
+                        },
+                              modifier = Modifier.fillMaxWidth(),
+                              placeholder = { Text(text = "Search For Name") }) {
+                        LazyColumn() {
+                            items(List1.value) { quotation ->
+                                BillFormat(quotation, navController, mainViewModel, color = value)
+                            }
+                        }
+
+                    }
+
+
+
                     LazyColumn {
                         items(it) {
-                            BillFormat(it, navController, mainViewModel)
+                            BillFormat(it, navController, mainViewModel, color = value)
                         }
                     }
                 }
@@ -87,21 +151,22 @@ fun ShowBillScreen(
 fun BillFormat(
     bill: bill,
     navController: NavHostController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    color: Color
               ) {
 
     val showDialog = remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier.padding(15.dp),
-        color = Color(0xFF673AB7),
+        color =color ,
         shape = MaterialTheme.shapes.small
            ) {
 
         Column(modifier = Modifier.padding(10.dp)) {
             Text(
                 text = "Id : ${bill.billNumber}",
-                color = Color(0xFFFFC107),
+                color = Color(0xFFE4E2DB),
                 style = MaterialTheme.typography.titleLarge
                 )
 
@@ -132,7 +197,7 @@ fun BillFormat(
 
                 Icon(
                     imageVector = Icons.Default.AccountCircle, contentDescription = "",
-                    tint = Color(0xFFFFC107)
+                    tint = Color(0xFFF5F1E6)
                     )
 
                 Text(
@@ -146,7 +211,7 @@ fun BillFormat(
 
                 Icon(
                     imageVector = Icons.Default.Call, contentDescription = "",
-                    tint = Color(0xFFFFC107)
+                    tint = Color(0xFFCECBC5)
                     )
 
                 Text(
@@ -302,12 +367,12 @@ fun BillFormat(
 
                     Icon(
                         imageVector = Icons.Default.Edit, contentDescription = "",
-                        tint = Color(0xFFFFC107)
+                        tint = Color(0xFFFFFFFF)
                         )
 
                     Text(
                         text = "Edit",
-                        color = Color(0xFFFFC107),
+                        color = Color(0xFFFCFCFC),
                         fontFamily = latosemibold,
                         modifier = Modifier.padding(start = 10.dp)
                         )
@@ -318,14 +383,14 @@ fun BillFormat(
                 }) {
                     Text(
                         text = "More",
-                        color = Color(0xFFFFC107),
+                        color = Color(0xFFD5D2CC),
                         fontFamily = latosemibold,
                         modifier = Modifier.padding(start = 10.dp)
                         )
 
                     Icon(
                         imageVector = Icons.Default.MoreVert, contentDescription = "",
-                        tint = Color(0xFFFFC107)
+                        tint = Color(0xFFFFFDF7)
                         )
 
 
@@ -357,6 +422,7 @@ fun ShowMore(
 
     ) {
     Dialog(onDismissRequest = { showDialog.value = false }) {
+        val context = LocalContext.current
         Surface {
             Column {
                 Text(
@@ -372,10 +438,22 @@ fun ShowMore(
                 }
                 HorizontalDivider()
                 ShowOptions(s = "Share Pdf", delete = R.drawable.next) {
+                    mainViewModel.downloadPdf(
+                        context = context,
+                        id = bill.id,
+                        share = true,
+                        url = "billPdf"
+                                             )
                 }
                 HorizontalDivider()
                 ShowOptions(s = "View Pdf", delete = R.drawable.pdf) {
 
+                    mainViewModel.downloadPdf(
+                         context = context,
+                         id = bill.id,
+                         share = false,
+                         url = "billPdf"
+                                             )
                 }
                 HorizontalDivider()
                 ShowOptions(s = "Generate Receipt", delete = R.drawable.receipt) {

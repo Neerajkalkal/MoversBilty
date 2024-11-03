@@ -26,12 +26,12 @@ import com.example.gangapackagesolution.screens.lrbilty.component.PackageDetails
 import com.example.gangapackagesolution.screens.lrbilty.component.TruckDetails
 import com.example.gangapackagesolution.screens.quotationScreen.CustomButton
 import com.example.gangapackagesolution.screens.quotationScreen.Header
-import com.example.gangapackagesolution.screens.screenName.Screens
 
 @Composable
 fun LrBillMainScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    value: Color
                     ) {
     val lrBiltyState = LrBiltyState(
         id = 1,
@@ -43,7 +43,7 @@ fun LrBillMainScreen(
            ) {
 
 
-            LrFormScreen(lrBiltyState,mainViewModel,navController)
+            LrFormScreen(lrBiltyState,mainViewModel,navController, color =value)
 
 
 
@@ -55,13 +55,13 @@ fun LrBillMainScreen(
 fun LrFormScreen(
     lrBiltyState: LrBiltyState,
     mainViewModel: MainViewModel,
-    navController: NavHostController
+    navController: NavHostController,color: Color
                 ) {
 
     Column {
 
 
-        Header(text = "Lr Bill", Color(0xFF673AB7)) {
+        Header(text = "Lr Bill", color) {
             navController.popBackStack()
         }
 
@@ -74,51 +74,54 @@ fun LrFormScreen(
 
             ActionCard(title = "Lr Details", expandCardCompose = {
                 Lr_BillDetails(lrBiltyState = lrBiltyState)
-            })
+            }, color =color )
 
             Spacer(modifier = Modifier.height(10.dp))
 
             ActionCard(title = "Bill Details", expandCardCompose = {
                 TruckDetails(lrBiltyState = lrBiltyState)
-            })
+            }, color =color
+                       )
 
             Spacer(modifier = Modifier.height(10.dp))
 
             ActionCard(title = "Consignor/Move From", expandCardCompose = {
                 MoveFrom(lrBiltyState = lrBiltyState)
-            })
+
+            }, color =color)
 
             Spacer(modifier = Modifier.height(10.dp))
 
             ActionCard(title = "Consignee/Move To", expandCardCompose = {
                 MoveTo(lrBiltyState = lrBiltyState)
-            })
+            }, color =color)
             Spacer(modifier = Modifier.height(10.dp))
 
-            ActionCard(title = "Packing Details", expandCardCompose =
+            ActionCard(
+                title = "Packing Details", expandCardCompose =
             {
                 PackageDetails(lrBiltyState = lrBiltyState)
-            })
+            }, color =color)
             Spacer(modifier = Modifier.height(10.dp))
 
             ActionCard(title = "Payment Details", expandCardCompose = {
                 PaymentDetails(lrBiltyState = lrBiltyState)
-            })
+            }, color =color)
             Spacer(modifier = Modifier.height(10.dp))
 
             ActionCard(title = "Material Insurance", expandCardCompose = {
                 MaterialInsurance(lrBiltyState)
-            })
+            }, color =color)
 
             Spacer(modifier = Modifier.height(10.dp))
 
             ActionCard(title = "Demurrage Charge", expandCardCompose = {
                 DemurrageCharge(lrBiltyState = lrBiltyState)
-            })
+            }, color =color)
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            CustomButton(onItemClick1 = "Submit") {
+            CustomButton(onItemClick1 = "Submit", color =color) {
                 mainViewModel.addlrbilty(lrBiltyState) {
                     navController.popBackStack()
                 }

@@ -1,9 +1,11 @@
 package com.example.gangapackagesolution.screens.homeScreen
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,8 +22,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -43,11 +47,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.example.gangapackagesolution.R
 import com.example.gangapackagesolution.models.DataOrException
@@ -62,13 +68,24 @@ import com.example.gangapackagesolution.ui.theme.latosemibold
 import kotlinx.coroutines.delay
 
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    color: MutableState<Color>
               ) {
     val ScreenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val showHelp = remember { mutableStateOf(false) }
+    val showSubscriptionError = remember {
+        mutableStateOf(false)
+    }
+
+
+    val showExit = remember {
+        mutableStateOf(false)
+    }
 
     val state = mainViewModel.userDetails.collectAsState()
 
@@ -88,7 +105,7 @@ fun HomeScreen(
              }
             ) {
         if (state.value.loading) {
-            LoadingScreen(color = Color.White, indicatorColor = Color(0xFF673AB7))
+            LoadingScreen(color = Color.White, indicatorColor = color.value)
         }
 
         if (state.value.data != null) {
@@ -97,7 +114,7 @@ fun HomeScreen(
                     .padding(it)
                     .fillMaxSize()
                     .background(
-                        Color(0xFF673AB7)
+                        color.value
                                )
                ) {
                 Box(
@@ -117,12 +134,16 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                       ) {
 
-                    TopHEader(navController,mainViewModel)
+                    TopHEader(
+                        navController, mainViewModel, color,
+                        state.value.data!!.newNotification
+                             )
                     if (state.value.data!!.subscription.isNotEmpty()) {
-                        SubscriptionCard(state)
+                        SubscriptionCard(state, color){
+                            showHelp.value = true
+                        }
                     }
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                        SearchBox()
 
 
                         Spacer(modifier = Modifier.height(5.dp))
@@ -161,14 +182,18 @@ fun HomeScreen(
 
                                     MainContent(
                                         R.drawable.checklist, "Packing List", Modifier.clickable {
-                                            navController.navigate(Screens.PackageScreen.name)
+                                            if (state.value.data!!.subscription.isEmpty() || state.value.data!!.subscribed) {
+                                                navController.navigate(Screens.PackageScreen.name)
+                                            }
                                         })
 
                                     MainContent(R.drawable.box_truck, "L-R Bility", Modifier
                                         .clickable {
-                                            navController.navigate(
-                                                Screens.LrBill.name
-                                                                  )
+                                            if (state.value.data!!.subscription.isEmpty() || state.value.data!!.subscribed) {
+                                                navController.navigate(
+                                                    Screens.LrBill.name
+                                                                      )
+                                            }
                                         }
                                                )
                                 }
@@ -180,17 +205,21 @@ fun HomeScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                    ) {
                                     MainContent(R.drawable.bill, "Bill", Modifier.clickable {
-                                        navController.navigate(Screens.Bill.name)
+                                        if (state.value.data!!.subscription.isEmpty() || state.value.data!!.subscribed) {
+                                            navController.navigate(Screens.Bill.name)
+                                        }
                                     })
 
                                     MainContent(
                                         R.drawable.receipt, "Money Reciept", Modifier.clickable {
-                                            navController.navigate(
-                                                Screens.MoneyReceiptScreen.name
-                                                                  )
+                                            if (state.value.data!!.subscription.isEmpty() || state.value.data!!.subscribed) {
+                                                navController.navigate(
+                                                    Screens.MoneyReceiptScreen.name
+                                                                      )
+                                            }
                                         })
 
-                                    val showHelp = remember { mutableStateOf(false) }
+
                                     MainContent(R.drawable.help1, "Help", Modifier.clickable {
                                         showHelp.value = true
                                     })
@@ -211,20 +240,28 @@ fun HomeScreen(
                         }
 
                         NavigationSurface("Packing List", R.drawable.checklist) {
-                            navController.navigate(Screens.GetPackage.name)
+                            if (state.value.data!!.subscription.isEmpty() || state.value.data!!.subscribed) {
+                                navController.navigate(Screens.GetPackage.name)
+                            }
 
                         }
 
                         NavigationSurface("L-R Bility", R.drawable.box_truck) {
-                            navController.navigate(Screens.GetLrBill.name)
+                            if (state.value.data!!.subscription.isEmpty() || state.value.data!!.subscribed) {
+                                navController.navigate(Screens.GetLrBill.name)
+                            }
                         }
 
                         NavigationSurface("Bill", R.drawable.bill) {
-                            navController.navigate(Screens.GetBill.name)
+                            if (state.value.data!!.subscription.isEmpty() || state.value.data!!.subscribed) {
+                                navController.navigate(Screens.GetBill.name)
+                            }
                         }
 
                         NavigationSurface("Money Reciept", R.drawable.receipt) {
-                            navController.navigate(Screens.GetMoneyReceipt.name)
+                            if (state.value.data!!.subscription.isEmpty() || state.value.data!!.subscribed) {
+                                navController.navigate(Screens.GetMoneyReceipt.name)
+                            }
                         }
 
 
@@ -242,6 +279,47 @@ fun HomeScreen(
             mainViewModel.getUserDetails()
         }
     }
+    val context = LocalContext.current
+    val activity = context as? Activity
+    if (showExit.value){
+        Dialog(onDismissRequest = { showExit.value = false }) {
+                Surface(modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp)
+                       ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally,
+                           verticalArrangement = Arrangement.spacedBy(10.dp)) {
+
+                        Text(text ="Are You  Sure Want to Exit",
+                             style = MaterialTheme.typography.bodyLarge,
+                             color = Color.Black,
+                             fontFamily = latosemibold,
+                             textAlign = TextAlign.Center)
+
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Button(
+                                onClick = {
+                                    activity?.finish()
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                                  ) {
+                                Text(text = "YES")
+                            }
+
+
+                            Button(
+                                onClick = {
+                                    showExit.value = false
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                                  ) {
+                                Text(text = "NO")
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
 }
 
 @Composable
@@ -334,7 +412,9 @@ fun MainContent(
 @Composable
 fun TopHEader(
     navController: NavHostController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    color: MutableState<Color>,
+    newNotification: Boolean
              ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -356,30 +436,51 @@ fun TopHEader(
             text = "Movers Bilty", textAlign = TextAlign.Center,
             fontFamily = latosemibold,
             style = MaterialTheme.typography.titleLarge,
-            color = Color(0xff62248F),
+            color = color.value,
             modifier = Modifier
             )
-        Icon(
-          imageVector = Icons.Default.Refresh,
-            contentDescription = "",
-            modifier = Modifier
-                .size(30.dp)
-                .clickable {
-                    mainViewModel.getUserDetails()
-                }
-             ,
-          tint = Color(0xff62248F))
 
+        Box(modifier = Modifier) {
+
+            Icon(
+                painter = painterResource(
+                    id = if (newNotification) {
+                        R.drawable.notification
+                    } else {
+                        R.drawable.bell
+                    }
+                                         ),
+                contentDescription = "",
+                modifier = Modifier
+                    .size(30.dp)
+                    .clickable {
+                        navController.navigate(Screens.Notifications.name)
+                    },
+                tint = color.value
+                )
+        }
 
     }
-
 }
 
+
 @Composable
-fun SearchBox() {
+fun SearchBox(
+    color: MutableState<Color>,
+    navController: NavHostController
+             ) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(
+                onClick = {
+                    navController.navigate(Screens.SearchScreen.name)
+                },
+                interactionSource = remember {
+                    MutableInteractionSource()
+                },
+                indication = null
+                      )
             .padding(start = 25.dp, end = 25.dp, top = 20.dp),
         color = Color.White,
         shape = RoundedCornerShape(10.dp),
@@ -403,7 +504,11 @@ fun SearchBox() {
 
 
 @Composable
-fun SubscriptionCard(state: State<DataOrException<UserDetails, Exception>>) {
+fun SubscriptionCard(
+    state: State<DataOrException<UserDetails, Exception>>,
+    color: MutableState<Color>,
+    onClick: () -> Unit
+                    ) {
     val rate = state.value.data!!.subscription
     val show = remember { mutableIntStateOf(0) }
 
@@ -423,8 +528,8 @@ fun SubscriptionCard(state: State<DataOrException<UserDetails, Exception>>) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 20.dp, end = 20.dp, top = 20.dp)
-            .border(color = Color.Transparent, width = 2.dp, shape = RoundedCornerShape(10.dp)),
-
+            .border(color = Color.Transparent, width = 2.dp, shape = RoundedCornerShape(10.dp))
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(
             containerColor = Color.White
                                         )
@@ -444,13 +549,13 @@ fun SubscriptionCard(state: State<DataOrException<UserDetails, Exception>>) {
                         text = "Company Name",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xff62248F)
+                        color = color.value
                         )
 
                     Text(
                         state.value.data!!.companyName,
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xff62248F)
+                        color = color.value
                         )
                 }
 
@@ -476,21 +581,21 @@ fun SubscriptionCard(state: State<DataOrException<UserDetails, Exception>>) {
                         "Current Plan",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xff62248F)
+                        color = color.value
                         )
                     Text(
                         if (state.value.data!!.subscribed) "subscribed" else "Free",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xff62248F)
+                        color = color.value
                         )
                 }
 
 
                 Text(
-                    "Rs "+rate[show.intValue].price + "/" + rate[show.intValue].id,
+                    "Rs " + rate[show.intValue].price + "/" + rate[show.intValue].id,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xff62248F)
+                    color = color.value
                     )
 
             }

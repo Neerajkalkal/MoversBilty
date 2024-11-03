@@ -1,12 +1,14 @@
 package com.example.gangapackagesolution.screens
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gangapackagesolution.models.DataOrException
 import com.example.gangapackagesolution.models.otpResponse
 import com.example.gangapackagesolution.repository.Repository
 import com.example.gangapackagesolution.repository.TokenManagement
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -66,4 +68,32 @@ class loginViewmodel(context: Context) : ViewModel() {
             )
         }
     }
-}
+
+    fun sendToken(){
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val token = task.result
+                    viewModelScope.launch {
+                        tokenManagement.getToken()?.let {
+                            Repository.sendFirebaseToken(
+                                firebaseToken = token,
+                                jwt = it,
+                                error = {
+                                    Log.d("Token Send","Successfully")
+                                },
+                                onCompleted = {
+                                    Log.d("Token Send","Successfully")
+                                }
+                                                        )
+                        }
+
+                        // Send token to your server or use it as needed
+                    } } else {
+
+                    Log.w("MainActivity", "Fetching FCM registration token failed", task.exception)
+                }
+            }
+
+        }
+    }
+

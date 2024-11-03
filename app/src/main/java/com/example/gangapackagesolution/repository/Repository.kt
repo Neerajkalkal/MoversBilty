@@ -14,6 +14,7 @@ import com.example.gangapackagesolution.models.UserDetails
 import com.example.gangapackagesolution.models.bill.bill
 import com.example.gangapackagesolution.models.lr_bilty.LrBilty
 import com.example.gangapackagesolution.models.moneyreceipt.MoneyReceipt
+import com.example.gangapackagesolution.models.notifications.Notifications
 import com.example.gangapackagesolution.models.otpResponse
 import com.example.gangapackagesolution.models.packageList.PackageList
 import com.google.gson.Gson
@@ -27,7 +28,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.Error
 
 object Repository {
 
@@ -848,8 +848,8 @@ object Repository {
         pdfState: MutableStateFlow<DataOrException<String, Exception>>,
         share: Boolean,
         token: String?,
-        url:String
-                           ) {
+        url: String
+                                  ) {
         pdfState.value = DataOrException(loading = true)
         val client = OkHttpClient()
         val request = Request.Builder()
@@ -914,6 +914,102 @@ object Repository {
         } catch (e: Exception) {
             pdfState.value = DataOrException(e = e, loading = false)
         }
+    }
+
+    // sending image
+    suspend fun sendFirebaseToken(
+        jwt: String,
+        firebaseToken: String,
+        onCompleted: () -> Unit,
+        error: (String) -> Unit
+                                 ) {
+        val requestBody = firebaseToken.toRequestBody("text/plain".toMediaTypeOrNull())
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url("${Constants.baseUrl}token/$jwt")
+            .post(requestBody)
+            .build()
+
+        withContext(Dispatchers.IO) {
+            try {
+                client.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) {
+                        val responseBody = response.body?.string()
+                        if (responseBody == "0") {
+                            onCompleted()
+                        } else {
+                            error("Something went wrong: $responseBody")
+                        }
+                    } else {
+                        error("HTTP error: ${response.code}")
+                    }
+                }
+            } catch (e: Exception) {
+                error(e.message.toString())
+            }
+        }
+    }
+
+    suspend fun getNotifications(
+        notifications: MutableStateFlow<DataOrException<List<Notifications>, Exception>>,
+        token: String?,
+                                ) {
+        notifications.value = DataOrException(loading = true)
+
+
+
+        try {
+
+            withContext(Dispatchers.IO) {
+                val client = OkHttpClient()
+                val request = Request.Builder()
+                    .url("${Constants.baseUrl}getNotifications/${token.toString()}")
+                    .get()
+                    .build()
+
+
+                client.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) {
+                        val notification =
+                            Gson().fromJson(
+                                response.body?.string(), Array<Notifications>::class.java
+                                           ).toList()
+                        notifications.value =
+                            DataOrException(data = notification, loading = false)
+                    } else {
+                        notifications.value =
+                            DataOrException(
+                                e = IOException("Something went wrong"), loading = false
+                                           )
+                    }
+                }
+            }
+
+        } catch (e: Exception) {
+            notifications.value =
+                DataOrException(e = IOException("Something went wrong"), loading = false)
+        }
+
+
+    }
+
+    suspend fun SendNotificationsUpdate(
+        token: String?,
+                                       ) {
+        try {
+            withContext(Dispatchers.IO) {
+                val client = OkHttpClient()
+                val request = Request.Builder()
+                    .url("${Constants.baseUrl}updateNotifications/${token.toString()}")
+                    .get()
+                    .build()
+                client.newCall(request).execute()
+            }
+
+        } catch (e: Exception) {
+            Log.d("$e", "e")
+        }
+
     }
 
 

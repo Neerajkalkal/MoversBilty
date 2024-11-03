@@ -10,12 +10,12 @@ data class UserDetails(
     val companyLogo:String,
     val subscribed:Boolean,
     val subscription:List<Pricing>,
-    val qrCode:String
+    val qrCode:String,
+    val newNotification:Boolean
                       )
 
 
 data class Pricing(
-
     val id: String,
     val price: String,
                   )

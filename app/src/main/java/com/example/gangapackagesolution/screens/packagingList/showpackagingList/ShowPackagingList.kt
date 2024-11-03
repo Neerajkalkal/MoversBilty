@@ -19,9 +19,11 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +35,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
@@ -47,11 +51,20 @@ import com.example.gangapackagesolution.screens.screenName.Screens
 import com.example.gangapackagesolution.models.packageList.PackageList
 import com.example.gangapackagesolution.ui.theme.latosemibold
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowPackagingList(
     packagingScreenViewmodel: MainViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    color: MutableState<Color>
                      ) {
+    val search = remember {
+        mutableStateOf("")
+    }
+
+    val active = remember {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(key1 = Unit) {
         packagingScreenViewmodel.getPackagingList()
@@ -61,7 +74,7 @@ fun ShowPackagingList(
     val packagingList = packagingScreenViewmodel.getPackagingList.collectAsState()
 
     if (packagingList.value.loading) {
-        LoadingScreen(color = Color.White, indicatorColor = Color(0xFF673AB7))
+        LoadingScreen(color = Color.White, indicatorColor = color.value)
 
     } else if (packagingList.value.e != null) {
         ErrorScreen(error = packagingList.value.e.toString()) {
@@ -71,17 +84,68 @@ fun ShowPackagingList(
 
 
         Column {
-            ShowingHeader("Packaging List")
+            ShowingHeader(
+                "Packaging List", color = color.value,
+                onClick1 = { packagingScreenViewmodel.getPackagingList() }) {
+                navController.popBackStack()
+            }
 
-            ShoSearch(text = "Search For Packaging List", onClick = {})
+
+
             if (packagingList.value.data?.isEmpty() != true && packagingList.value.data != null) {
-
                 val packageList1 = packagingList.value.data!!.sortedBy {
                     it.id
                 }
+
+                var List1 = remember {
+                    mutableStateOf(packageList1)
+                }
+
+                SearchBar(query = search.value, onQueryChange = {
+                    search.value = it
+
+                    List1.value = packageList1.filter { list ->
+                        list.name.toLowerCase()
+                            .contains(search.value.toLowerCase()) || list.phone.contains(
+                            search.value
+                                                                                        )
+
+                    }
+
+
+                }, onSearch = {
+                    List1.value = packageList1.filter { list ->
+                        list.name.toLowerCase()
+                            .contains(search.value.toLowerCase()) || list.phone.contains(
+                            search.value
+                                                                                        )
+
+                    }
+                },
+                          active = active.value, onActiveChange = {
+                        active.value = !active.value
+                    },
+                          modifier = Modifier.fillMaxWidth(),
+                          placeholder = { Text(text = "Search For Name Or Number") }) {
+                    LazyColumn() {
+                        items(List1.value) {
+                            PackagingList(
+                                it, packagingScreenViewmodel, navController, color = color.value
+                                         )
+                        }
+                    }
+
+                }
+
+
+
+
+
                 LazyColumn() {
                     items(packageList1) {
-                        PackagingList(it, packagingScreenViewmodel, navController)
+                        PackagingList(
+                            it, packagingScreenViewmodel, navController, color = color.value
+                                     )
                     }
                 }
 
@@ -106,20 +170,21 @@ fun ShowPackagingList(
 fun PackagingList(
     packageList: PackageList,
     packagingScreenViewmodel: MainViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    color: Color
                  ) {
     val showDialog = remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier.padding(15.dp),
-        color = Color(0xFF673AB7),
+        color = color,
         shape = MaterialTheme.shapes.small
            ) {
 
         Column(modifier = Modifier.padding(10.dp)) {
             Text(
                 text = "Id : ${packageList.packagingNumber}",
-                color = Color(0xFFFFC107),
+                color = Color(0xFFF1ECDC),
                 style = MaterialTheme.typography.titleLarge
                 )
 
@@ -150,7 +215,7 @@ fun PackagingList(
 
                 Icon(
                     imageVector = Icons.Default.AccountCircle, contentDescription = "",
-                    tint = Color(0xFFFFC107)
+                    tint = Color(0xFFFFFEFC)
                     )
 
                 Text(
@@ -164,7 +229,7 @@ fun PackagingList(
 
                 Icon(
                     imageVector = Icons.Default.Call, contentDescription = "",
-                    tint = Color(0xFFFFC107)
+                    tint = Color(0xFFE2DED1)
                     )
 
                 Text(
@@ -238,12 +303,12 @@ fun PackagingList(
 
                     Icon(
                         imageVector = Icons.Default.Edit, contentDescription = "",
-                        tint = Color(0xFFFFC107)
+                        tint = Color(0xFFE2E2E2)
                         )
 
                     Text(
                         text = "Edit",
-                        color = Color(0xFFFFC107),
+                        color = Color(0xFFFDFBF4),
                         fontFamily = latosemibold,
                         modifier = Modifier.padding(start = 10.dp)
                         )
@@ -254,14 +319,14 @@ fun PackagingList(
                 }) {
                     Text(
                         text = "More",
-                        color = Color(0xFFFFC107),
+                        color = Color(0xFFFFF5D8),
                         fontFamily = latosemibold,
                         modifier = Modifier.padding(start = 10.dp)
                         )
 
                     Icon(
                         imageVector = Icons.Default.MoreVert, contentDescription = "",
-                        tint = Color(0xFFFFC107)
+                        tint = Color(0xFFFCF8EF)
                         )
 
 
@@ -286,6 +351,7 @@ fun ShowMorePackage(
     showDialog: MutableState<Boolean>,
     packagingScreenViewmodel: MainViewModel
                    ) {
+    val context = LocalContext.current
     Dialog(onDismissRequest = { showDialog.value = false }) {
         Surface {
             Column {
@@ -301,10 +367,21 @@ fun ShowMorePackage(
                 }
                 HorizontalDivider()
                 ShowOptions(s = "Share Pdf", delete = R.drawable.next) {
+                    packagingScreenViewmodel.downloadPdf(
+                        context = context,
+                        share = true,
+                        id = packageList.id.toString(),
+                        url = "packingListPdf"
+                                                        )
                 }
                 HorizontalDivider()
                 ShowOptions(s = "View Pdf", delete = R.drawable.pdf) {
-
+                    packagingScreenViewmodel.downloadPdf(
+                        context = context,
+                        share = false,
+                        id = packageList.id.toString(),
+                        url = "packingListPdf"
+                                                        )
                 }
                 HorizontalDivider()
             }
@@ -314,10 +391,15 @@ fun ShowMorePackage(
 
 
 @Composable
-fun ShowingHeader(s: String,onClick:()->Unit={}) {
+fun ShowingHeader(
+    s: String,
+    color: Color,
+    onClick1: () -> Unit = {},
+    onClick: () -> Unit = {}
+                 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color(0xFF673AB7)
+        color = color
            ) {
         Row(
             modifier = Modifier.padding(14.dp),
@@ -329,7 +411,7 @@ fun ShowingHeader(s: String,onClick:()->Unit={}) {
                 tint = Color.White,
                 modifier = Modifier.clickable {
                     onClick()
-                } )
+                })
 
 
             Text(
@@ -341,7 +423,10 @@ fun ShowingHeader(s: String,onClick:()->Unit={}) {
 
             Icon(
                 imageVector = Icons.Default.Refresh, contentDescription = "",
-                tint = Color.White
+                tint = Color.White,
+                modifier = Modifier.clickable {
+                    onClick1()
+                }
                 )
         }
 

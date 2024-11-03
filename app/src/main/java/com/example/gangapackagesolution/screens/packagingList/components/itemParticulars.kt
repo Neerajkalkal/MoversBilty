@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.gangapackagesolution.screens.quotationScreen.CustomButton
 import com.example.gangapackagesolution.screens.quotationScreen.RegularField
@@ -23,7 +24,7 @@ fun ItemParticulars(
     value: MutableState<String>,
     itemremark: MutableState<String>,
     itemParticulars: MutableState<List<itemParticulars>>
-                   ) {
+                ,color: Color   ) {
     RegularField(quotationId = itemname, s = "Item Name")
 
     Row(
@@ -45,7 +46,7 @@ fun ItemParticulars(
     }
     RegularField(itemremark, false, "Remark")
     Spacer(modifier = Modifier.height(10.dp))
-    CustomButton("Save Item") {
+    CustomButton("Save Item", color = color) {
         if (
             !itemParticulars.value.contains(
                 itemParticulars(
@@ -68,5 +69,5 @@ fun ItemParticulars(
     }
     Spacer(modifier = Modifier.height(10.dp))
 
-    ShowAndRemoveItems(itemParticulars = itemParticulars)
+    ShowAndRemoveItems(itemParticulars = itemParticulars, color = color)
 }

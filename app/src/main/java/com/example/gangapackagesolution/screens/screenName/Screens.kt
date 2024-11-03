@@ -19,6 +19,7 @@ enum class Screens {
     GetBill,
     BillForm,
     ProfileScreen,
-    NewUser
-
+    NewUser,
+    Notifications,
+    SearchScreen
 }

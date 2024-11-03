@@ -22,12 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.gangapackagesolution.models.Quotation.Quotation
 import com.example.gangapackagesolution.models.itemsParticaular.itemParticulars
 import com.example.gangapackagesolution.ui.theme.latosemibold
 
 @Composable
-fun QuotationScreen(data: Quotation, onlick: (Quotation) -> Unit) {
+fun QuotationScreen(data: Quotation,color: Color ,navController: NavController,onlick: (Quotation) -> Unit) {
     val quotationId = remember {
         mutableStateOf(data.id.toString())
     }
@@ -254,7 +255,7 @@ fun QuotationScreen(data: Quotation, onlick: (Quotation) -> Unit) {
             .background(
 
 
-                color = Color(0xFF673AB7),
+                color =color,
             )
     ) {
         Column(
@@ -262,7 +263,9 @@ fun QuotationScreen(data: Quotation, onlick: (Quotation) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
 
-            Header("Quotation")
+            Header("Quotation"){
+                navController.popBackStack()
+            }
             QuotationForm(
                 quotationId,
                 movingType,
@@ -320,6 +323,7 @@ fun QuotationScreen(data: Quotation, onlick: (Quotation) -> Unit) {
                 includedLoading,
                 includedUnLoading,
                 includedPackingMaterial,
+                color = color
             ) {
                 val edited = Quotation(
                     id = quotationId.value.toInt(),

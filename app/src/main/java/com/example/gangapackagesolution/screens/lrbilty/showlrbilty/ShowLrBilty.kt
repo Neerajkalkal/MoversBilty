@@ -19,9 +19,11 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,17 +49,27 @@ import com.example.gangapackagesolution.screens.loadingAndErrorScreen.LoadingScr
 import com.example.gangapackagesolution.screens.packagingList.showpackagingList.ShowingHeader
 import com.example.gangapackagesolution.screens.quotationScreen.quotationShow.ShoSearch
 import com.example.gangapackagesolution.screens.quotationScreen.quotationShow.ShowOptions
+import com.example.gangapackagesolution.screens.quotationScreen.quotationShow.ShowQuotation
 import com.example.gangapackagesolution.screens.screenName.Screens
 import com.example.gangapackagesolution.ui.theme.latosemibold
 import java.time.LocalDateTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowLrBill(
     navController: NavHostController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    color: Color
               ) {
     val state = mainViewModel.lrBill.collectAsState()
 
+    val search = remember {
+        mutableStateOf("")
+    }
+
+    val active = remember {
+        mutableStateOf(false)
+    }
 
     val data = state.value.data?.sortedBy {
         it.lrNumber
@@ -65,17 +77,18 @@ fun ShowLrBill(
 
 
     Column {
-        ShowingHeader(s = "Lr Bills") {
+        ShowingHeader(s = "Lr Bills", color = color, onClick1 = { mainViewModel.getLrBill() }) {
             navController.popBackStack()
+
         }
 
-        ShoSearch(onClick = {}, text = "LR Bills")
+
 
 
         if (state.value.loading) {
             LoadingScreen(
                 color = Color.White, indicatorColor =
-                Color(0xFF673AB7)
+                color
                          )
         }
         if (state.value.e != null) {
@@ -85,16 +98,73 @@ fun ShowLrBill(
         }
 
         if (state.value.data != null) {
+            val packageList1 = remember {
+                data
+            }
+
+            var List1 = remember {
+                mutableStateOf(packageList1)
+            }
+
+            SearchBar(query = search.value, onQueryChange = {
+                search.value = it
+
+                if (packageList1 != null) {
+                    List1.value = packageList1.filter { list ->
+
+                        list.consignorName.toLowerCase()
+                            .contains(
+                                search.value.toLowerCase()
+                                     ) || list.consigneeName.toLowerCase()
+                            .contains(search.value.toLowerCase())
+
+                    }
+                }
+
+
+            }, onSearch = {
+                if (packageList1 != null) {
+                    List1.value = packageList1.filter { list ->
+
+                        list.consignorName.toLowerCase()
+                            .contains(
+                                search.value.toLowerCase()
+                                     ) || list.consigneeName.toLowerCase()
+                            .contains(search.value.toLowerCase())
+
+                    }
+                }
+            },
+                      active = active.value, onActiveChange = {
+                    active.value = !active.value
+                },
+                      modifier = Modifier.fillMaxWidth(),
+                      placeholder = { Text(text = "Search For Name") }) {
+                LazyColumn() {
+                    items(List1.value.orEmpty()) { quotation ->
+                        ShowBills(quotation, mainViewModel, navController, color)
+                    }
+                }
+
+            }
+
+
+
+
+
+
+
+
             LazyColumn {
                 items(data!!) {
-                    ShowBills(it, mainViewModel,navController)
+                    ShowBills(it, mainViewModel, navController, color)
                 }
             }
 
 
         }
 
-        if (data!=null) {
+        if (data != null) {
             if (data.isEmpty() && state.value.e == null && !state.value.loading) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -114,21 +184,22 @@ fun ShowLrBill(
 fun ShowBills(
     lrBilty: LrBilty,
     mainViewModel: MainViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    color: Color
              ) {
 
     val showDialog = remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier.padding(15.dp),
-        color = Color(0xFF673AB7),
+        color = color,
         shape = MaterialTheme.shapes.small
            ) {
 
         Column(modifier = Modifier.padding(10.dp)) {
             Text(
                 text = "Id : ${lrBilty.lrNumber}",
-                color = Color(0xFFFFC107),
+                color = Color(0xFFDAD7CE),
                 style = MaterialTheme.typography.titleLarge
                 )
 
@@ -159,7 +230,7 @@ fun ShowBills(
 
                 Icon(
                     imageVector = Icons.Default.AccountCircle, contentDescription = "",
-                    tint = Color(0xFFFFC107)
+                    tint = Color(0xFFF8F4E8)
                     )
 
                 Text(
@@ -173,7 +244,7 @@ fun ShowBills(
 
                 Icon(
                     imageVector = Icons.Default.Call, contentDescription = "",
-                    tint = Color(0xFFFFC107)
+                    tint = Color(0xFFF0EBDD)
                     )
 
                 Text(
@@ -281,7 +352,8 @@ fun ShowBills(
                     lrBilledit.insuranceRisk.value = lrBilty.insuranceRisk
                     lrBilledit.demarrageCharge.value = lrBilty.demarrageCharge
                     lrBilledit.perDayorhour.value = lrBilty.perDayorhour
-                    lrBilledit.demurageChargeApplicableAfter.value = lrBilty.demurageChargeApplicableAfter
+                    lrBilledit.demurageChargeApplicableAfter.value =
+                        lrBilty.demurageChargeApplicableAfter
 
 
 
@@ -300,12 +372,12 @@ fun ShowBills(
 
                     Icon(
                         imageVector = Icons.Default.Edit, contentDescription = "",
-                        tint = Color(0xFFFFC107)
+                        tint = Color(0xFFEEE9DB)
                         )
 
                     Text(
                         text = "Edit",
-                        color = Color(0xFFFFC107),
+                        color = Color(0xFFF3F2EF),
                         fontFamily = latosemibold,
                         modifier = Modifier.padding(start = 10.dp)
                         )
@@ -316,14 +388,14 @@ fun ShowBills(
                 }) {
                     Text(
                         text = "More",
-                        color = Color(0xFFFFC107),
+                        color = Color(0xFFF3F1EB),
                         fontFamily = latosemibold,
                         modifier = Modifier.padding(start = 10.dp)
                         )
 
                     Icon(
                         imageVector = Icons.Default.MoreVert, contentDescription = "",
-                        tint = Color(0xFFFFC107)
+                        tint = Color(0xFFF3EFE2)
                         )
 
 
@@ -336,7 +408,7 @@ fun ShowBills(
 
     }
     if (showDialog.value) {
-        ShowMorePackage(showDialog,mainViewModel,lrBilty,navController)
+        ShowMorePackage(showDialog, mainViewModel, lrBilty, navController)
     }
 
 
@@ -363,7 +435,7 @@ fun ShowMorePackage(
                     )
                 HorizontalDivider()
                 ShowOptions(s = "Delete", delete = R.drawable.delete) {
-mainViewModel.deleteLr(id = lrBilty.id.toString())
+                    mainViewModel.deleteLr(id = lrBilty.id.toString())
                 }
                 HorizontalDivider()
                 ShowOptions(s = "Share Pdf", delete = R.drawable.next) {
@@ -420,7 +492,7 @@ mainViewModel.deleteLr(id = lrBilty.id.toString())
                     billState.freightCharge.value = lrBilty.totalBasicFreight
                     billState.loadingCharge.value = lrBilty.loadingCharges
                     billState.advancePaid.value = lrBilty.freightPaid
-                   billState.loadingChargeType.value = "Additional From Freight"
+                    billState.loadingChargeType.value = "Additional From Freight"
                     billState.loadingCharge.value = lrBilty.loadingCharges
                     billState.unloadingChargeType.value = "Additional To Freight"
                     billState.unloadingCharge.value = lrBilty.unloadingCharges
@@ -428,7 +500,7 @@ mainViewModel.deleteLr(id = lrBilty.id.toString())
                     billState.otherCharge.value = lrBilty.otherCharges
                     billState.miscellaneousCharge.value = lrBilty.lr_cnCharges
                     billState.gst.value = lrBilty.gstperc
-                    billState.gstin.value ="Included In Bill"
+                    billState.gstin.value = "Included In Bill"
                     billState.gstpaidby.value = lrBilty.gstPaidBy
 
 
