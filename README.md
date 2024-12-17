@@ -12,7 +12,7 @@ The app features user authentication, secure login, and various functionalities 
 ## Backend: Spring Boot
 ## Cloud Services: AWS EC2, S3
 ## Other Tools: PDF Generation, JWT for authentication
-# Backend
+Backend
 # Overview
 The backend for the Movers Bilty App is built with Spring Boot, providing a robust API for generating and managing PDF documents. AWS EC2 is used for hosting the application, while AWS S3 handles the storage of generated PDFs.
 The backend also includes user authentication features to ensure secure access.
